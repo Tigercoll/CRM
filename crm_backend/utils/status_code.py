@@ -12,3 +12,5 @@
 OK = 1000
 # 登录失败
 LOGIN_ERROR = 1001
+# 认证失败
+AUTH_FAIL = 1002

@@ -128,3 +128,15 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# token过期时间
+EXPIRES_TIME = 60*60*24
+
+
+# RESTFARMWORK settings
+REST_FRAMEWORK ={
+    'DEFAULT_AUTHENTICATION_CLASSES':[
+        'base.my_auth.MyAuth',
+    ]
+}

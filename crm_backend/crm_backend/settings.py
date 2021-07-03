@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.login',
     'apps.userinfo',
+    'rbac',
     'rest_framework'
 ]
 
@@ -137,6 +138,6 @@ EXPIRES_TIME = 60*60*24
 # RESTFARMWORK settings
 REST_FRAMEWORK ={
     'DEFAULT_AUTHENTICATION_CLASSES':[
-        'base.my_auth.MyAuth',
+        # 'base.my_auth.MyAuth',
     ]
 }

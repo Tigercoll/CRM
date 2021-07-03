@@ -1,5 +1,6 @@
 from django.db import models
-from apps.base.basemodel import BaseModel
+from base.basemodel import BaseModel
+from rbac.models import Roles,UserRoleRelation
 import datetime
 # Create your models here.
 
@@ -30,6 +31,15 @@ class UserInfo(BaseModel):
     def __str__(self):
         return '%s'%self.user_name
 
+    @property
+    def roles(self):
+        '''获取用户角色'''
+        if not hasattr(self,'_roles'):
+            # 获取该用户下的角色ID
+            relations = UserRoleRelation.objects.filter(user_id=self.id)
+            role_id_list = [r.role_id for r in relations]
+            self._roles = Roles.objects.filter(id__in=role_id_list)
+        return self._roles
 
 class UserProfile(models.Model):
     '''用户扩展表'''

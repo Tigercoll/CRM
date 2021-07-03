@@ -15,7 +15,7 @@ Including another URLconf
 """
 
 from django.urls import path
-from apps.login.views import *
+from .views import *
 urlpatterns = [
     path('login/',Login.as_view()),
 

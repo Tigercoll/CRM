@@ -15,7 +15,6 @@ class UserInfo(BaseModel):
     user_pwd = models.CharField(max_length=64,verbose_name='密码')
     user_email = models.CharField(max_length=32,verbose_name='邮箱')
     user_status = models.IntegerField(choices=status,verbose_name='用户状态',default=1)
-    user_role = models.IntegerField(verbose_name='用户角色',null=True,blank=True)
     last_login_time = models.DateTimeField(verbose_name='最后一次登录时间',null=True)
 
     # 用户一对一关联扩展模块

@@ -17,6 +17,13 @@ Including another URLconf
 from django.urls import path
 from .views import *
 urlpatterns = [
-    path('permission',PermissionsView.as_view()),
-    path('permission<int:pk>',PermissionsView.as_view()),
+    path('permission/', PermissionsView.as_view()),
+    path('permission/<int:pk>/', PermissionsView.as_view()),
+    path('permission/list/<str:type>/',PermissionsListView.as_view()),
+    path('permission/level/<int:level>/',PermissionsLevelView.as_view()),
+    path('menu/',MenuListView.as_view()),
+
+    path('roles/list/',RolesListView.as_view()),
+    path('roles/<int:pk>',RolesView.as_view()),
+    path('roles/',RolesView.as_view())
 ]

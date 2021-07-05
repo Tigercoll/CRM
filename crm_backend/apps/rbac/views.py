@@ -30,7 +30,7 @@ class PermissionsView(APIView):
         if ser.is_valid():
             ser.save()
             return render_data(status_code.OK,ser.data,'添加权限成功')
-        return render_data(status_code.FAILED_2_ADD_PERMISSIONS,ser.errors,'添加权限失败')
+        return render_data(status_code.FAILED_2_ADD,ser.errors,'添加权限失败')
 
     def put(self,request,pk):
         # 更新权限
@@ -42,7 +42,7 @@ class PermissionsView(APIView):
         if ser.is_valid():
             ser.save()
             return render_data(status_code.OK, ser.data, '修改权限成功')
-        return render_data(status_code.FAILED_2_UPDATE_PERMISSIONS, ser.errors, '修改权限失败')
+        return render_data(status_code.FAILED_2_UPDATE, ser.errors, '修改权限失败')
 
     def delete(self,request,pk):
         # 删除权限
@@ -76,23 +76,50 @@ class PermissionsLevelView(APIView):
         return render_data(status_code.OK,per_list,'获取权限等级成功')
 
 class RolesListView(APIView):
+    # 获取角色列表
     def get(self,request):
         roles_list = Roles.get_roles_list()
         return render_data(status_code.OK,roles_list,'获取角色列表成功')
+
 class RolesView(APIView):
+    # 获取单个角色
     def get(self,request,pk):
         roles_obj = Roles.objects.filter(id=pk).first()
         if not roles_obj:
             return render_data(status_code.PARAMETER_ERROR, '', '参数错误')
         return render_data(status_code.OK,roles_obj.to_dict(),'获取角色成功')
-
+    # 添加角色
     def post(self,request):
         data = request.data
         ser = RoleSerializers(data=data)
         if ser.is_valid():
             ser.save()
             return render_data(status_code.OK, ser.data, '添加角色成功')
-        return render_data(status_code.FAILED_2_ADD_PERMISSIONS, ser.errors, '添加角色失败')
+        return render_data(status_code.FAILED_2_ADD, ser.errors, '添加角色失败')
+    # 修改角色
+    def put(self,request,pk):
+        roles_obj = Roles.objects.filter(id=pk).first()
+        data = request.data
+        ser = RoleSerializers(instance=roles_obj,data=data)
+        if ser.is_valid():
+            ser.save()
+            return render_data(status_code.OK, ser.data, '修改角色成功')
+        return render_data(status_code.FAILED_2_UPDATE, ser.errors, '修改角色失败')
+    def delete(self,request,pk):
+        # 删除角色
+        role_obj = Roles.objects.filter(id=pk).first()
+        if not role_obj:
+            return render_data(status_code.PARAMETER_ERROR, '', '参数错误')
+        # 删除角色
+        role_obj.delete()
+        RolePermissionRelation.objects.filter(role_id=pk).delete()
+        # 删除角色权限关系表
+        return render_data(status_code.OK, '', '删除成功')
+
+class RolesHasPermissionView(APIView):
+    def get(self,request,pk):
+        roles_per_list =Roles.get_role_has_permissions(pk)
+        return render_data(status_code.OK,roles_per_list,'获取成功')
 
 class MenuListView(APIView):
     def get(self,request):

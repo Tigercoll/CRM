@@ -25,5 +25,6 @@ urlpatterns = [
 
     path('roles/list/',RolesListView.as_view()),
     path('roles/<int:pk>',RolesView.as_view()),
+    path('roles/permissions/<int:pk>',RolesHasPermissionView.as_view()),
     path('roles/',RolesView.as_view())
 ]

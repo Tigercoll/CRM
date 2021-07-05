@@ -27,7 +27,7 @@ class Roles(models.Model):
         for r in role_obj:
             roles_list.append(r.to_dict())
         return roles_list
-
+    # 获取权限列表
     @property
     def permissions(self):
         '''获取该角色下的所有权限'''
@@ -38,6 +38,34 @@ class Roles(models.Model):
             permissions_id_list = [r.permission_id for r in relations]
             self._permissions = Permissions.objects.filter(id__in=permissions_id_list)
         return self._permissions
+
+    # 获取该角色下的权限树
+    @classmethod
+    def get_role_has_permissions(cls,role_id):
+        role_obj = cls.objects.filter(id=role_id).first()
+        if not role_obj:
+            return ''
+        # 获取所有的权限
+        per_1_dict = {}
+        per_objs = role_obj.permissions
+        for per_1 in per_objs:
+            if per_1.permission_level==1:
+                    per_1_dict[per_1.id] = per_1.to_dict()
+                    per_1_dict[per_1.id]['children'] = []
+        # 存放二级权限
+        per_2_dict = {}
+        for per_2 in per_objs:
+            if per_2 .permission_level==2:
+                tmp = per_2.to_dict()
+                tmp.update({'children':[]})
+                per_2_dict[per_2.id]=tmp
+                per_1_dict[per_2.permission_parent_id]['children'].append(tmp)
+
+        for per_3 in per_objs:
+            if per_3.permission_level==3:
+                per_2_dict[per_3.permission_parent_id]['children'].append(per_3.to_dict())
+
+        return per_1_dict.values()
 
 
 class Permissions(models.Model):

@@ -42,10 +42,12 @@ INSTALLED_APPS = [
     'apps.login',
     'apps.userinfo',
     'rbac',
-    'rest_framework'
+    'rest_framework',
+    'corsheaders'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware' ,  # 注册中间件
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -134,6 +136,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # token过期时间
 EXPIRES_TIME = 60*60*24
 
+
+# 配置跨域
+# 允许全部来源
+CORS_ORIGIN_ALLOW_ALL  = False  # 如果为True，将不使用白名单，并且将接受所有来源。默认为False。
+
+# 白名单
+CORS_ORIGIN_WHITELIST  =  [
+    "http://127.0.0.1:8080",
+    "http://localhost:8080"
+]
+
+APPEND_SLASH = True
 
 # RESTFARMWORK settings
 REST_FRAMEWORK ={

@@ -1,17 +1,30 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../components/Login.vue'
+import Users from '../components/Users.vue'
+import Home from '../components/Home.vue'
 
 Vue.use(VueRouter)
 
 const routes = [
   // 重定向到login
   { path: '/', redirect: '/login' },
-  { path: '/login', component: Login }
+  { path: '/login', component: Login },
+  { path: '/users', component: Users },
+  { path: '/home', component: Home }
 ]
 
 const router = new VueRouter({
   routes
 })
+
+// GOOD
+router.beforeEach((to, from, next) => {
+  const token = window.sessionStorage.getItem('token')
+  // 获取url 如果不是login 或者没有token 跳转到login
+  if (to.path!== '/login' && !token) next('/login')
+  else next()
+})
+
 
 export default router

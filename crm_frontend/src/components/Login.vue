@@ -1,7 +1,12 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <el-form class="login-form" ref="login_ref" :rules="login_rules" :model="login_form">
+      <el-form
+        class="login-form"
+        ref="login_ref"
+        :rules="login_rules"
+        :model="login_form"
+      >
         <el-form-item prop="user_name">
           <el-input v-model="login_form.user_name" prefix-icon="el-icon-user">
           </el-input>
@@ -24,7 +29,7 @@
 </template>
 
 <script>
-import post from "../assets/js/utils.js"
+import post from "../assets/js/utils.js";
 
 export default {
   name: "Login",
@@ -53,22 +58,32 @@ export default {
 
   methods: {
     //   点击重置按钮重置表单
-      resetLoginForm(){
-          this.$refs.login_ref.resetFields()
-      },
+    resetLoginForm() {
+      this.$refs.login_ref.resetFields();
+    },
     //   登录
-    login(){
-        // 通过validate校验
-         this.$refs.login_ref.validate(async valid=>{
-            if(!valid){
-                return
-            }
-           
-                const result =await post('login/',this.login_form)
-            console.log(result)
-            
-})
-    }
+    login() {
+      // 通过validate校验
+      this.$refs.login_ref.validate(async (valid) => {
+        if (!valid) {
+          return;
+        }
+
+        const result = await post("login/", this.login_form);
+        if (result.code!==1000) {
+          this.$message({
+          message: result.msg,
+          type: 'error'
+        });
+        return
+        }
+        window.sessionStorage.setItem('token',result.data.token)
+        this.$router.push({
+          path:'home'
+        })
+
+      });
+    },
   },
 };
 </script>

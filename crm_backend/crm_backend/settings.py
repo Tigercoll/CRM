@@ -144,7 +144,8 @@ CORS_ORIGIN_ALLOW_ALL  = False  # 如果为True，将不使用白名单，并且
 # 白名单
 CORS_ORIGIN_WHITELIST  =  [
     "http://127.0.0.1:8080",
-    "http://localhost:8080"
+    "http://localhost:8080",
+    "http://192.168.12.91:8080"
 ]
 
 APPEND_SLASH = True
@@ -152,6 +153,6 @@ APPEND_SLASH = True
 # RESTFARMWORK settings
 REST_FRAMEWORK ={
     'DEFAULT_AUTHENTICATION_CLASSES':[
-        # 'base.my_auth.MyAuth',
+        'base.my_auth.MyAuth',
     ]
 }

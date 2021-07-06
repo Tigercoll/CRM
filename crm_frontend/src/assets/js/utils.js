@@ -10,4 +10,13 @@ const post = (async (url,data)=>{
     }
 })
 
-export default post
+const get = (async (url,data='')=>{
+    try {
+        const {data:result} = await axios.get(url,data)
+        return result
+    } catch (error) {
+        return {msg:error.message}
+    }
+})
+
+export {post,get}

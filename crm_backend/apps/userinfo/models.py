@@ -40,6 +40,7 @@ class UserInfo(BaseModel):
             self._roles = Roles.objects.filter(id__in=role_id_list)
         return self._roles
 
+
 class UserProfile(models.Model):
     '''用户扩展表'''
     full_name = models.CharField(max_length=32,verbose_name='姓名')

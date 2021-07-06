@@ -125,7 +125,16 @@ class MenuListView(APIView):
     def get(self,request):
         user = request.user
         user_roles_obj = user.roles
-        per_list = []
+        per_dict={}
+        per_2_list = []
         for role_obj in user_roles_obj:
-            per_list.append(role_obj.permissions)
-        return render_data(status_code.OK,per_list,'获取菜单列表')
+            for per in role_obj.permissions:
+                if per.permission_level==1:
+                    per_dict[per.id]=per.to_dict()
+                    per_dict[per.id]['children']=[]
+                if per.permission_level==2:
+                    per_2_list.append(per)
+        for per_2 in per_2_list:
+            if per_2.permission_parent_id in per_dict:
+                per_dict[per_2.permission_parent_id]['children'].append(per_2.to_dict())
+        return render_data(status_code.OK,per_dict.values(),'获取菜单列表')

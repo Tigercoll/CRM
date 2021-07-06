@@ -74,7 +74,7 @@ class Permissions(models.Model):
     permission_url = models.CharField(max_length=32,verbose_name='权限URL')
     permission_parent_id = models.IntegerField(verbose_name='权限父ID',null=True)
     permission_level = models.IntegerField(verbose_name='权限等级')
-
+    permission_icon = models.CharField(verbose_name='图标',null=True,default='',max_length=32)
     # 转化为字典
     def to_dict(self):
         return {
@@ -82,7 +82,8 @@ class Permissions(models.Model):
             'permission_name':self.permission_name,
             'permission_url':self.permission_url,
             'permission_level':self.permission_level,
-            'permission_parent_id':self.permission_parent_id
+            'permission_parent_id':self.permission_parent_id,
+            'permission_icon':self.permission_icon
         }
 
     # 根据权限等级获取权限

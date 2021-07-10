@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import post from "../assets/js/utils.js";
+import {post} from "../assets/js/utils.js";
 
 export default {
   name: "Login",

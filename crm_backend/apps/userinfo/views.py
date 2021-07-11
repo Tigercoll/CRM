@@ -30,7 +30,7 @@ class UserInfoListView(APIView):
         if ser.is_valid():
             ser.save()
             return response_format.render_data(status_code.OK,'','用户添加成功')
-        return response_format.render_data(status_code.FAILED_2_ADD,'','用户添加失败')
+        return response_format.render_data(status_code.FAILED_2_ADD,'',ser.errors)
 
 class UserinfoView(APIView):
     def get(self,request,pk):

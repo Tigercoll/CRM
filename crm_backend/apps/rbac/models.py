@@ -178,3 +178,12 @@ class UserRoleRelation(models.Model):
 
     class Meta:
         db_table='t_userrolerelation'
+
+    @classmethod
+    def add_user_role(cls,user_id,roles_id_list):
+        # 先把有的角色全删除,可以优化查出来做差集,多的删除,少的添加
+        cls.objects.filter(user_id=user_id).delete()
+        cls_list=[]
+        for roles_id in roles_id_list:
+            cls_list.append(cls(user_id=user_id,role_id=roles_id))
+        cls.objects.bulk_create(cls_list)

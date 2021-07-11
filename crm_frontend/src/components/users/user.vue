@@ -15,7 +15,11 @@
             >添加用户</el-button
           >
           <!-- 添加用户 -->
-          <el-dialog title="添加用户" :visible.sync="addUserFromVisible" width='25%'>
+          <el-dialog
+            title="添加用户"
+            :visible.sync="addUserFromVisible"
+            width="25%"
+          >
             <el-form
               ref="add_user_ref"
               :model="addUserForm"
@@ -75,9 +79,11 @@
               </template>
             </el-table-column>
             <el-table-column label="操作">
-              <template slot-scope='scope'>
-                <el-button size="mini" @click="editUser(scope.row)">编辑</el-button>
-                <el-button size="mini" type="danger">删除</el-button>
+              <template slot-scope="scope">
+                <el-button size="mini" @click="editUser(scope.row)"
+                  >编辑</el-button
+                >
+                <el-button size="mini" type="danger" @click="delete_user(scope.row)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -94,18 +100,57 @@
         </div>
       </el-card>
       <!-- 编辑用户 -->
-      <el-dialog title="编辑用户" :visible.sync="editUserFormVisible" width='25%'>
-        <el-form class="edit-user" >
-          <el-form-item label="用户名:" label-width='80px' >
-            <el-input autocomplete="off"></el-input>
+      <el-dialog
+        title="编辑用户"
+        :visible.sync="editUserFormVisible"
+        width="25%"
+        :model="editForm"
+      >
+        <el-form class="edit-user">
+          <el-form-item label="用户名:" label-width="80px">
+            <el-input
+              autocomplete="off"
+              v-model="editForm.user_name"
+            ></el-input>
           </el-form-item>
-        
+          <el-form-item label="密码:" label-width="80px">
+            <el-input autocomplete="off" v-model="editForm.user_pwd"></el-input>
+          </el-form-item>
+          <el-form-item label="邮箱:" label-width="80px">
+            <el-input
+              autocomplete="off"
+              v-model="editForm.user_email"
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="状态:" label-width="80px">
+            <el-select v-model="editForm.user_status" placeholder="请选择状态">
+              <el-option
+                :label="item[1]"
+                :value="item[0]"
+                :key="item[0]"
+                v-for="item in editForm.status_list"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="角色:" label-width="80px">
+            <el-select
+              v-model="editForm.roles_id"
+              multiple
+              placeholder="请选择"
+            >
+              <el-option
+                v-for="role in editForm.roles_list"
+                :key="role.id"
+                :label="role.role_name"
+                :value="role.id"
+              >
+              </el-option>
+            </el-select>
+          </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="editUserFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="editUserFormVisible = false"
-            >确 定</el-button
-          >
+          <el-button type="primary" @click="updateEditForm">确 定</el-button>
         </div>
       </el-dialog>
     </div>
@@ -113,7 +158,7 @@
 </template>
 <script>
 import Crumb from "../crumb.vue";
-import { get, post } from "../../assets/js/utils";
+import { get, post ,put ,_delete} from "../../assets/js/utils";
 export default {
   name: "users",
   data() {
@@ -175,9 +220,18 @@ export default {
         ],
       },
       // 编辑用户对话框
-      editUserFormVisible:false,
+      editUserFormVisible: false,
       // 编辑用户表单
-      editForm :{}
+      editForm: {
+        id: "",
+        user_name: "",
+        user_pwd: "",
+        user_email: "",
+        user_status: "",
+        roles_id: [],
+        roles_list: [],
+        status_list:[]
+      },
     };
   },
 
@@ -244,9 +298,45 @@ export default {
       this.addUserFromVisible = false;
     },
     // 编辑用户
-    editUser(row){
+    editUser(row) {
       console.log(row);
-      this.editUserFormVisible=true
+      this.get_user_single(row.id);
+      this.editUserFormVisible = true;
+    },
+    // 获取单条user
+    async get_user_single(id) {
+      const result = await get(`/users/${id}`);
+      if (result.code != 1000) return this.$message.error(result.msg);
+      this.editForm = result.data;
+    },
+    // 提交更新
+    async updateEditForm() {
+      // console.log(this.editForm);
+      const result = await put(`/users/${this.editForm.id}`,this.editForm)
+      if (result.code !=1000) return this.$message.error(result.msg)
+      this.$message.success(result.msg)
+      this.get_user_list()
+      this.editUserFormVisible = false;
+    },
+    delete_user(row){
+      this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+         const result =await _delete(`/users/${row.id}`)
+         if (result.code!=1000) return this.$message.error(result.msg)
+         this.get_user_list()
+          this.$message({
+            type: 'success',
+            message: result.msg,
+          });
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
     }
   },
 };
@@ -268,7 +358,7 @@ export default {
 .add-user .el-input__inner {
   width: 90%;
 }
-.edit-user .el-input__inner{
+/* .edit-user .el-input__inner {
   width: 90%;
-}
+} */
 </style>

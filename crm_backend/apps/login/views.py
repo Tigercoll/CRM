@@ -5,6 +5,7 @@ from .serializers import LoginSerializer
 from userinfo.models import UserInfo
 from utils import status_code,jwt_token
 from utils.response_format import render_data
+import datetime
 # Create your views here.
 
 class Login(APIView):
@@ -20,6 +21,8 @@ class Login(APIView):
         data = request.data
         user = UserInfo.objects.filter(**data).first()
         if user:
+            user.last_login_time = datetime.datetime.now()
+            user.save()
             # 状态保持
             data = {
                 'user_id':user.id,

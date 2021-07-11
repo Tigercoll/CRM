@@ -17,10 +17,18 @@ class UserInfo(BaseModel):
     user_status = models.IntegerField(choices=status,verbose_name='用户状态',default=1)
     last_login_time = models.DateTimeField(verbose_name='最后一次登录时间',null=True)
 
-
-
-
-    # 用户一对一关联扩展模块
+    def to_dict(self):
+        return{
+            'id':self.id,
+            'user_name' :self.user_name,
+            'user_pwd':self.user_pwd,
+            'user_email':self.user_email,
+            'user_status':self.user_status,
+            'roles_id':[role.id for role in self.roles],
+            'status_list': self.status,
+            'roles_list':Roles.get_roles_list(),
+        }
+    # 用户一对last_login_time'一关联扩展模块
     @property
     def userprofile(self):
         if not hasattr(self,'_userprofile'):
@@ -42,6 +50,9 @@ class UserInfo(BaseModel):
             role_id_list = [r.role_id for r in relations]
             self._roles = Roles.objects.filter(id__in=role_id_list)
         return self._roles
+
+
+
 
 
 

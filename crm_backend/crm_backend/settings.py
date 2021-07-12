@@ -156,5 +156,11 @@ APPEND_SLASH = True
 REST_FRAMEWORK ={
     'DEFAULT_AUTHENTICATION_CLASSES':[
         'base.my_auth.MyAuth',
-    ]
+    ],
+    # 全局配置异常模块
+    'EXCEPTION_HANDLER': 'base.exception.custom_exception_handler',
+    # 修改默认返回JSON的renderer的类
+    # 'DEFAULT_RENDERER_CLASSES': (
+    #     'base.rendererresponse.customrenderer',
+    # ),
 }

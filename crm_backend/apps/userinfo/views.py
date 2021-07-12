@@ -12,9 +12,12 @@ from django.db.models import Q
 class UserInfoListView(APIView):
 
     def get(self,request,*args,**kwargs):
-
+        user_query = request.GET.get('q','')
         p = MyPagination()
-        user_obj = UserInfo.objects.all().order_by('id')
+        if not user_query:
+            user_obj = UserInfo.objects.all().order_by('id')
+        else:
+            user_obj = UserInfo.objects.filter(Q(user_name__contains=user_query)|Q(user_email__contains=user_query)).order_by('id')
         user_list_obj = p.paginate_queryset(user_obj,request)
 
         ser = UserInfoSerializers(instance=user_list_obj,many=True)
@@ -30,6 +33,7 @@ class UserInfoListView(APIView):
         if ser.is_valid():
             ser.save()
             return response_format.render_data(status_code.OK,'','用户添加成功')
+        print(ser.errors)
         return response_format.render_data(status_code.FAILED_2_ADD,'',ser.errors)
 
 class UserinfoView(APIView):

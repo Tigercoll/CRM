@@ -9,7 +9,7 @@
             v-model="user_query"
             class="query"
           >
-            <el-button slot="append" icon="el-icon-search"></el-button>
+            <el-button slot="append" icon="el-icon-search" @click="search"></el-button>
           </el-input>
           <el-button type="primary" @click="openAddUserForm"
             >添加用户</el-button
@@ -27,6 +27,8 @@
               class="add-user"
               :rules="addUserRules"
             >
+ 
+              
               <el-form-item
                 label="用户名:"
                 label-width="100px"
@@ -70,12 +72,22 @@
         </div>
         <!-- 显示用户列表 -->
         <div class="user-table">
-          <el-table :data="user_list" style="width: 100%">
+          <el-table :data="user_list" style="width: 100%" border>
+            <el-table-column type="index" label="编号" :index="indexMethod" width="60px"> </el-table-column>
             <el-table-column prop="user_name" label="用户名"> </el-table-column>
             <el-table-column prop="user_email" label="邮箱"> </el-table-column>
             <el-table-column label="状态">
               <template slot-scope="scope">
                 <span>{{ scope.row.user_status.status }}</span>
+              </template>
+            </el-table-column>
+              <el-table-column label="角色">
+              <template slot-scope="scope">
+                <el-tag :key="role.id"
+            v-for="role in scope.row.roles"
+            :type="types[role.id % 5]"
+          effect="dark"
+          disable-transitions>{{role.name}}</el-tag>
               </template>
             </el-table-column>
             <el-table-column label="操作">
@@ -158,7 +170,7 @@
 </template>
 <script>
 import Crumb from "../crumb.vue";
-import { get, post ,put ,_delete} from "../../assets/js/utils";
+import { get, post, put, _delete } from "../../assets/js/utils";
 export default {
   name: "users",
   data() {
@@ -185,6 +197,7 @@ export default {
     return {
       // 用户列表
       user_list: [],
+      types: ["success", "info", "danger", "warning", ""],
       user_query: "",
       // 每页显示条码个数
       page_size: 10,
@@ -230,7 +243,7 @@ export default {
         user_status: "",
         roles_id: [],
         roles_list: [],
-        status_list:[]
+        status_list: [],
       },
     };
   },
@@ -244,9 +257,17 @@ export default {
   },
 
   methods: {
+    indexMethod(index) {
+      
+        return index +1;
+      },
+    //查询
+    search() {
+      this.get_user_list();
+    },
     async get_user_list() {
       const result = await get(
-        `users/?page=${this.current_page}&&size=${this.page_size}`
+        `users/?page=${this.current_page}&&size=${this.page_size}&&q=${this.user_query}`
       );
       if (result.code != 1000) {
         this.$message.error(result.msg);
@@ -312,32 +333,34 @@ export default {
     // 提交更新
     async updateEditForm() {
       // console.log(this.editForm);
-      const result = await put(`/users/${this.editForm.id}`,this.editForm)
-      if (result.code !=1000) return this.$message.error(result.msg)
-      this.$message.success(result.msg)
-      this.get_user_list()
+      const result = await put(`/users/${this.editForm.id}`, this.editForm);
+      if (result.code != 1000) return this.$message.error(result.msg);
+      this.$message.success(result.msg);
+      this.get_user_list();
       this.editUserFormVisible = false;
     },
-    delete_user(row){
-      this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(async () => {
-         const result =await _delete(`/users/${row.id}`)
-         if (result.code!=1000) return this.$message.error(result.msg)
-         this.get_user_list()
+    delete_user(row) {
+      this.$confirm("此操作将永久删除该记录, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(async () => {
+          const result = await _delete(`/users/${row.id}`);
+          if (result.code != 1000) return this.$message.error(result.msg);
+          this.get_user_list();
           this.$message({
-            type: 'success',
+            type: "success",
             message: result.msg,
           });
-        }).catch(() => {
+        })
+        .catch(() => {
           this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });          
+            type: "info",
+            message: "已取消删除",
+          });
         });
-    }
+    },
   },
 };
 </script>
@@ -357,6 +380,9 @@ export default {
 }
 .add-user .el-input__inner {
   width: 90%;
+}
+.el-tag {
+  margin: 0 10px;
 }
 /* .edit-user .el-input__inner {
   width: 90%;

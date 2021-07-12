@@ -1,12 +1,14 @@
 <template>
     <div>
         <Crumb></Crumb>
+        <div class="list">
+         <el-card class="box-card">123</el-card>
+         </div>
     </div>
 </template>
 <script>
 import Crumb from '../crumb.vue'
 export default {
-    name: 'WorkspaceJsonRole',
     components: { Crumb },
 
     
@@ -26,3 +28,9 @@ export default {
     },
 };
 </script>
+<style>
+.list {
+  height: 100%;
+  margin-top: 20px;
+}
+</style>

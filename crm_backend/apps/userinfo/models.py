@@ -11,7 +11,7 @@ class UserInfo(BaseModel):
         (1,'启用'),
         (2,'删除'),
     )
-    user_name = models.CharField(max_length=32,verbose_name='用户名',unique=True)
+    user_name = models.CharField(max_length=32,verbose_name='用户名')
     user_pwd = models.CharField(max_length=64,verbose_name='密码')
     user_email = models.CharField(max_length=32,verbose_name='邮箱')
     user_status = models.IntegerField(choices=status,verbose_name='用户状态',default=1)
@@ -51,7 +51,13 @@ class UserInfo(BaseModel):
             self._roles = Roles.objects.filter(id__in=role_id_list)
         return self._roles
 
-
+    @classmethod
+    def has_exists(cls,user_name):
+        exists = cls.objects.filter(user_name=user_name).exists()
+        if not exists:
+            return True
+        else:
+            return False
 
 
 

@@ -4,7 +4,7 @@ from django.db import models
 
 class Roles(models.Model):
     '''角色表'''
-    role_name = models.CharField(max_length=32,verbose_name='角色名',unique=True)
+    role_name = models.CharField(max_length=32,verbose_name='角色名')
     role_desc = models.CharField(max_length=128,verbose_name='角色说明',null=True)
     class Meta:
         db_table='t_roles'
@@ -39,6 +39,14 @@ class Roles(models.Model):
             self._permissions = Permissions.objects.filter(id__in=permissions_id_list)
         return self._permissions
 
+    # 判断用户是否存在
+    @classmethod
+    def has_exists(cls,role_name):
+        exists = cls.objects.filter(role_name=role_name).exists()
+        if not exists:
+            return True
+        else:
+            return False
     # 获取该角色下的权限树
     @classmethod
     def get_role_has_permissions(cls,role_id):
@@ -72,9 +80,9 @@ class Permissions(models.Model):
     '''权限表'''
     permission_name = models.CharField(max_length=32,verbose_name='权限名',unique=True)
     permission_url = models.CharField(max_length=32,verbose_name='权限URL')
-    permission_parent_id = models.IntegerField(verbose_name='权限父ID',null=True)
+    permission_parent_id = models.IntegerField(verbose_name='权限父ID',null=True,blank=True)
     permission_level = models.IntegerField(verbose_name='权限等级')
-    permission_icon = models.CharField(verbose_name='图标',null=True,default='',max_length=32)
+    permission_icon = models.CharField(verbose_name='图标',null=True,default='',max_length=32,blank=True)
     # 转化为字典
     def to_dict(self):
         return {
@@ -103,7 +111,7 @@ class Permissions(models.Model):
     def get_permission_list(cls):
         '''获取所有权限列表'''
         per_list = []
-        per_obj = cls.objects.all().order_by('permission_level')
+        per_obj = cls.objects.all()
         for per in per_obj:
             per_list.append(per.to_dict())
         return per_list
@@ -169,6 +177,54 @@ class RolePermissionRelation(models.Model):
 
     class Meta:
         db_table='t_rolepermissionrelation'
+
+    @ classmethod
+    def get_level_3_permission_list_by(cls,role_id):
+        per_List = []
+        per_obj_list = cls.objects.filter(role_id=role_id)
+        if not per_obj_list:
+            return per_List
+        else:
+            for per in per_obj_list:
+                print(per.permission_id)
+                per_obj = Permissions.objects.filter(id=per.permission_id,permission_level=3).first()
+                if per_obj:
+                    per_List.append(per_obj.id)
+            return per_List
+
+    @classmethod
+    def add_permission_by(cls,role_id,permission_list):
+        # 清空权限列表
+        cls.objects.filter(role_id=role_id).delete()
+        per_obj_list = []
+        for permission_id in permission_list:
+            per_obj_list.append(cls(role_id=role_id,permission_id=permission_id))
+
+        cls.objects.bulk_create(per_obj_list)
+        return True
+
+
+    @classmethod
+    def delete_role_permission(cls,role_id,permission_id):
+        per_list = [permission_id,]
+        per = Permissions.objects.filter(id=permission_id).first()
+        if not per:
+            return False
+        if per.permissions:
+            per_children = per.permissions
+            for child in per_children:
+                per_list.append(child.id)
+                if child.permissions:
+                    [per_list.append(c.id) for c in child.permissions]
+
+        role_per = cls.objects.filter(role_id=role_id,permission_id__in=per_list)
+
+        print(role_per)
+        if not role_per:
+            return False
+        else:
+            role_per.delete()
+            return True
 
 
 class UserRoleRelation(models.Model):

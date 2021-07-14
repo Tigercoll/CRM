@@ -84,8 +84,8 @@
               <el-table-column label="角色">
               <template slot-scope="scope">
                 <el-tag :key="role.id"
-            v-for="role in scope.row.roles"
-            :type="types[role.id % 5]"
+            v-for="(role,index) in scope.row.roles"
+            :type="types[index% 5]"
           effect="dark"
           disable-transitions>{{role.name}}</el-tag>
               </template>

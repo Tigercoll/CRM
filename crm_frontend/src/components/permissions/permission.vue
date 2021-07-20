@@ -220,6 +220,7 @@ export default {
     },
     // 获取单挑权限
     async openEditPermission(row){
+      this.search_permission(row.permission_level)
       const result = await get(`permission/${row.id}`)
       if(result.code!==1000)return this.message.error(result.msg)
       this.permission_form = result.data

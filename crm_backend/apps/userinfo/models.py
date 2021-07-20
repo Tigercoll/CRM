@@ -1,5 +1,6 @@
 from django.db import models
-from apps.base.basemodel import BaseModel
+from base.basemodel import BaseModel
+from rbac.models import Roles,UserRoleRelation
 import datetime
 # Create your models here.
 
@@ -10,14 +11,24 @@ class UserInfo(BaseModel):
         (1,'启用'),
         (2,'删除'),
     )
-    user_name = models.CharField(max_length=32,verbose_name='用户名',unique=True)
+    user_name = models.CharField(max_length=32,verbose_name='用户名')
     user_pwd = models.CharField(max_length=64,verbose_name='密码')
     user_email = models.CharField(max_length=32,verbose_name='邮箱')
     user_status = models.IntegerField(choices=status,verbose_name='用户状态',default=1)
-    user_role = models.IntegerField(verbose_name='用户角色',null=True,blank=True)
     last_login_time = models.DateTimeField(verbose_name='最后一次登录时间',null=True)
 
-    # 用户一对一关联扩展模块
+    def to_dict(self):
+        return{
+            'id':self.id,
+            'user_name' :self.user_name,
+            'user_pwd':self.user_pwd,
+            'user_email':self.user_email,
+            'user_status':self.user_status,
+            'roles_id':[role.id for role in self.roles],
+            'status_list': self.status,
+            'roles_list':Roles.get_roles_list(),
+        }
+    # 用户一对last_login_time'一关联扩展模块
     @property
     def userprofile(self):
         if not hasattr(self,'_userprofile'):
@@ -29,6 +40,26 @@ class UserInfo(BaseModel):
         db_table = 't_userinfo'
     def __str__(self):
         return '%s'%self.user_name
+
+    @property
+    def roles(self):
+        '''获取用户角色'''
+        if not hasattr(self,'_roles'):
+            # 获取该用户下的角色ID
+            relations = UserRoleRelation.objects.filter(user_id=self.id)
+            role_id_list = [r.role_id for r in relations]
+            self._roles = Roles.objects.filter(id__in=role_id_list)
+        return self._roles
+
+    @classmethod
+    def has_exists(cls,user_name):
+        exists = cls.objects.filter(user_name=user_name).exists()
+        if not exists:
+            return True
+        else:
+            return False
+
+
 
 
 class UserProfile(models.Model):

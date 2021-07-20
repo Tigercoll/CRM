@@ -1,0 +1,32 @@
+"""crm_backend URL Configuration
+
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/3.2/topics/http/urls/
+Examples:
+Function views
+    1. Add an import:  from my_app import views
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
+Class-based views
+    1. Add an import:  from other_app.views import Home
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
+Including another URLconf
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+"""
+
+from django.urls import path
+from .views import *
+urlpatterns = [
+    path('permission/', PermissionsView.as_view()),
+    path('permission/<int:pk>/', PermissionsView.as_view()),
+    path('permission/list/<str:type>/',PermissionsListView.as_view()),
+    path('permission/level/<int:level>/',PermissionsLevelView.as_view()),
+    path('menu/',MenuListView.as_view()),
+
+    path('roles/list/',RolesListView.as_view()),
+    path('roles/<int:pk>',RolesView.as_view()),
+    path('roles/permissions/<int:pk>',RolesHasPermissionView.as_view()),
+    path('roles/<int:pk>/permissions/list/',RolesHasPermissionListView.as_view()),
+    path('roles/<int:role_id>/permissions/<int:permission_id>',RolesHasPermissionView.as_view()),
+    path('roles/',RolesView.as_view())
+]

@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'apps.userinfo',
     'rbac',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'customer'
 ]
 
 MIDDLEWARE = [

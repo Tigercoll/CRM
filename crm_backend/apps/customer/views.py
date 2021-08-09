@@ -3,21 +3,24 @@ from .serializers import CustomerSerializers
 from .models import Customer
 from utils import status_code,response_format
 from base.pagination import MyPagination
+from django.db.models import Q
 # Create your views here.
 
 class CustomerListView(APIView):
 
 
     def get(self,request):
-        
-        customer_obj = Customer.objects.all().order_by('id')
+        q = request.GET.get('q','')
+        if not  q:
+            customer_obj = Customer.objects.all().order_by('id')
+        else:
+            customer_obj = Customer.objects.filter(Q(hospital_code__contains=q)|Q(hospital_name__contains=q)|Q(hospital_contacts__contains=q)).order_by('id')
         p = MyPagination()
         customer_list_obj = p.paginate_queryset(customer_obj,request)
         ser = CustomerSerializers(many=True,instance=customer_list_obj)
         data = {
             'total':customer_obj.count(),
             'page':p.page.number,
-            'size':p.get_page_size(request),
             'customer_list':ser.data
         }
         return  response_format.render_data(status_code.OK, data,'获取成功')

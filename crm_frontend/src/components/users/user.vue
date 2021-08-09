@@ -375,6 +375,9 @@ export default {
   justify-content: flex-start;
   width: 400px;
 }
+.user-table{
+  margin-top: 20px;
+}
 .query {
   padding-right: 20px;
 }

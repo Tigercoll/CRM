@@ -17,7 +17,7 @@ class MyPagination(PageNumberPagination):
     # 分页参数 ?size=2 来改变分页长度
     page_size_query_param = 'size'
     # 最大分页长度
-    max_page_size = 10
+    max_page_size = 100
     # Client can control the page using this query parameter.
     page_query_param = 'page'
     invalid_page_message = ('参数错误')

@@ -17,7 +17,7 @@ Including another URLconf
 from django.urls import path
 from .views import *
 urlpatterns = [
-    path('customer/',CustomerListView.as_view()),
-    path('customer/<int:pk>',CustomerView.as_view()),
+    path('customers/',CustomerListView.as_view()),
+    path('customers/<int:pk>',CustomerView.as_view()),
 
 ]

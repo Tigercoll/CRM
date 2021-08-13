@@ -8,13 +8,12 @@ from django.db.models import Q
 
 class CustomerListView(APIView):
 
-
     def get(self,request):
         q = request.GET.get('q','')
         if not  q:
-            customer_obj = Customer.objects.all().order_by('id')
+            customer_obj = Customer.objects.filter().order_by('id')
         else:
-            customer_obj = Customer.objects.filter(Q(hospital_code__contains=q)|Q(hospital_name__contains=q)|Q(hospital_contacts__contains=q)).order_by('id')
+            customer_obj = Customer.objects.filter().filter(Q(hospital_code__contains=q)|Q(hospital_name__contains=q)|Q(hospital_contacts__contains=q)).order_by('id')
         p = MyPagination()
         customer_list_obj = p.paginate_queryset(customer_obj,request)
         ser = CustomerSerializers(many=True,instance=customer_list_obj)
@@ -32,7 +31,6 @@ class CustomerListView(APIView):
             ser.save()
             return response_format.render_data(status_code.OK,ser.data,'添加成功')
         return response_format.render_data(status_code.FAILED_2_ADD,ser.errors,'添加失败')
-
 
 class CustomerView(APIView):
     authentication_classes = []

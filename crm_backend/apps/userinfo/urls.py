@@ -19,5 +19,6 @@ from .views import *
 urlpatterns = [
     path('users/', UserInfoListView.as_view()),
     path('users/<pk>', UserinfoView.as_view()),
+    path('users/all/',UserInfoAll.as_view())
 
 ]

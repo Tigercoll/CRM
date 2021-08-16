@@ -19,5 +19,7 @@ from .views import *
 urlpatterns = [
     path('customers/',CustomerListView.as_view()),
     path('customers/<int:pk>',CustomerView.as_view()),
+    path('linkman/',LinkmanListView.as_view()),
+    path('customers/<int:pk>',LinkmanView.as_view()),
 
 ]

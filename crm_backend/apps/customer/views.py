@@ -1,9 +1,10 @@
 from rest_framework.views import APIView
-from .serializers import CustomerSerializers
-from .models import Customer
+from .serializers import CustomerSerializers,LinkmanSerializers
+from .models import Customer,LinkMan
 from utils import status_code,response_format
 from base.pagination import MyPagination
 from django.db.models import Q
+from django.db import transaction
 # Create your views here.
 
 class CustomerListView(APIView):
@@ -54,3 +55,40 @@ class CustomerView(APIView):
             return response_format.render_data(status_code.FAILED_2_DELETE, '', '删除失败')
         customer_obj.delete()
         return response_format.render_data(status_code.OK, '', '删除成功')
+
+
+
+
+
+class LinkmanListView(APIView):
+    def get(self,request):
+        q = request.GET.get('q')
+        if not q:
+            linkman_obj = LinkMan.objects.all()
+        else:
+            customer_id_list = Customer.objects.filter(customer_name__contains=q).values_list('customer_id')
+            linkman_obj = LinkMan.objects.filter(Q(name__contains=q)|Q(customer_id__in=customer_id_list))
+        p = MyPagination()
+        linkman_list_obj = p.paginate_queryset(linkman_obj, request)
+        ser = LinkmanSerializers(instance=linkman_list_obj,many=True)
+        data = {
+            'total': linkman_obj.count(),
+            'page': p.page.number,
+            'linkman_list': ser.data
+        }
+        return response_format.render_data(status_code.OK,data,'获取成功')
+
+    def post(self,request):
+        data = request.data
+        pass
+
+
+class LinkmanView(APIView):
+    def get(self,request,pk):
+        pass
+
+    def post(self,request,pk):
+        pass
+
+    def delete(self,request,pk):
+        pass

@@ -68,3 +68,11 @@ class LinkMan(models.Model):
 
     class Meta:
         db_table = 't_linkman'
+
+
+
+    @property
+    def customer(self):
+        if not hasattr(self,'_customer'):
+            self._customer = Customer.objects.filter(id=self.customer_id).first()
+        return self._customer

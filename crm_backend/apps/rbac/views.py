@@ -26,7 +26,7 @@ class PermissionsView(APIView):
     def post(self,request):
         # 添加权限
         data = request.data
-        print(data)
+
         ser = PermissionSerializers(data=data)
         if ser.is_valid():
             ser.save()
@@ -162,7 +162,7 @@ class MenuListView(APIView):
                 if per_2.id not in per_exist_list:
                     per_exist_list.append(per_2.id)
                     per_dict[per_2.permission_parent_id]['children'].append(per_2.to_dict())
-        print(per_dict)
+
         return render_data(status_code.OK,per_dict.values(),'获取菜单列表')
 
 

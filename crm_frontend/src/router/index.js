@@ -6,6 +6,7 @@ import dash from '../components/dash.vue'
 import User from '../components/users/user.vue'
 import Role from '../components/roles/role.vue'
 import Permission from '../components/permissions/permission.vue'
+import Customers from '../components/customers/customers.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -17,7 +18,8 @@ const routes = [
     { path: '/welcome', component: dash },
     { path: '/users', component: User },
     { path: '/roles', component: Role },
-    { path: '/permission', component: Permission }
+    { path: '/permission', component: Permission },
+    { path: '/customers', component: Customers }
   ]}
 ]
 

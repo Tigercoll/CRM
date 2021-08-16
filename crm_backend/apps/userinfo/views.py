@@ -70,3 +70,8 @@ class UserinfoView(APIView):
         return response_format.render_data(status_code.OK,'' ,'删除成功')
 
 
+class UserInfoAll(APIView):
+    def get(self,request):
+        salesman_list = UserInfo.get_salesman_list()
+        return response_format.render_data(status_code.OK,salesman_list,'获取成功')
+

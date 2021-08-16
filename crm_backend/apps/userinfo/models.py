@@ -58,9 +58,20 @@ class UserInfo(BaseModel):
             return True
         else:
             return False
-
-
-
+    def salesman_dict(self):
+        return {
+            'id':self.id,
+            'user_name':self.user_name
+        }
+    @classmethod
+    def get_salesman_list(cls):
+        salesman_list = []
+        salesman_obj = cls.objects.all()
+        for salesman in salesman_obj:
+            salesman_list.append(
+                salesman.salesman_dict()
+            )
+        return salesman_list
 
 class UserProfile(models.Model):
     '''用户扩展表'''

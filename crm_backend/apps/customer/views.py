@@ -1,10 +1,13 @@
 from rest_framework.views import APIView
-from .serializers import CustomerSerializers,LinkmanSerializers
+
+import userinfo.models
+from .serializers import CustomerSerializers,LinkmanSerializers,CustomerSearchSerializers
 from .models import Customer,LinkMan
 from utils import status_code,response_format
 from base.pagination import MyPagination
 from django.db.models import Q
 from django.db import transaction
+from userinfo.models import UserInfo
 # Create your views here.
 
 class CustomerListView(APIView):
@@ -14,7 +17,8 @@ class CustomerListView(APIView):
         if not  q:
             customer_obj = Customer.objects.filter().order_by('id')
         else:
-            customer_obj = Customer.objects.filter().filter(Q(hospital_code__contains=q)|Q(hospital_name__contains=q)|Q(hospital_contacts__contains=q)).order_by('id')
+            salesman_list = UserInfo.objects.filter(user_name__contains=q).values_list('id')
+            customer_obj = Customer.objects.filter(Q(customer_name=q)|Q(customer_desc=q)|Q(salesman__in=salesman_list)).order_by('id')
         p = MyPagination()
         customer_list_obj = p.paginate_queryset(customer_obj,request)
         ser = CustomerSerializers(many=True,instance=customer_list_obj)
@@ -55,8 +59,17 @@ class CustomerView(APIView):
             return response_format.render_data(status_code.FAILED_2_DELETE, '', '删除失败')
         customer_obj.delete()
         return response_format.render_data(status_code.OK, '', '删除成功')
-
-
+from django.db.models import CharField
+from django.db.models.functions import Cast
+class CustomerListSearch(APIView):
+    def get(self,request):
+        kw = request.GET.get('kw')
+        if not kw:
+            customer_list_obj = Customer.objects.all()
+        else:
+            customer_list_obj = Customer.objects.annotate(as_customer_id=Cast('customer_id',CharField())).filter(Q(customer_name__contains=kw)|Q(as_customer_id__contains=kw))
+        ser = CustomerSearchSerializers(instance=customer_list_obj,many=True)
+        return response_format.render_data(status_code.OK,ser.data,'获取成功')
 
 
 
@@ -64,10 +77,10 @@ class LinkmanListView(APIView):
     def get(self,request):
         q = request.GET.get('q')
         if not q:
-            linkman_obj = LinkMan.objects.all()
+            linkman_obj = LinkMan.objects.all().order_by('-id')
         else:
             customer_id_list = Customer.objects.filter(customer_name__contains=q).values_list('customer_id')
-            linkman_obj = LinkMan.objects.filter(Q(name__contains=q)|Q(customer_id__in=customer_id_list))
+            linkman_obj = LinkMan.objects.filter(Q(name__contains=q)|Q(customer_id__in=customer_id_list)).order_by('-id')
         p = MyPagination()
         linkman_list_obj = p.paginate_queryset(linkman_obj, request)
         ser = LinkmanSerializers(instance=linkman_list_obj,many=True)
@@ -80,7 +93,12 @@ class LinkmanListView(APIView):
 
     def post(self,request):
         data = request.data
-        pass
+        print(data)
+        ser = LinkmanSerializers(data=data)
+        if ser.is_valid():
+            ser.save()
+            return response_format.render_data(status_code.OK,ser.data,'添加成功')
+        return response_format.render_data(status_code.FAILED_2_ADD,ser.errors,'添加失败')
 
 
 class LinkmanView(APIView):

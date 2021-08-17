@@ -7,6 +7,7 @@ import User from '../components/users/user.vue'
 import Role from '../components/roles/role.vue'
 import Permission from '../components/permissions/permission.vue'
 import Customers from '../components/customers/customers.vue'
+import Linkman from '../components/linkmans/linkman.vue'
 Vue.use(VueRouter)
 
 const routes = [
@@ -19,7 +20,8 @@ const routes = [
     { path: '/users', component: User },
     { path: '/roles', component: Role },
     { path: '/permission', component: Permission },
-    { path: '/customers', component: Customers }
+    { path: '/customers', component: Customers },
+    { path: '/linkman', component: Linkman }
   ]}
 ]
 

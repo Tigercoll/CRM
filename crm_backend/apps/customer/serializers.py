@@ -25,6 +25,12 @@ class CustomerSerializers(serializers.ModelSerializer):
         return obj.salesman_name(obj.salesman)
 
 
+class CustomerSearchSerializers(serializers.Serializer):
+    customer_id = serializers.IntegerField()
+    customer_name = serializers.CharField()
+
+
+
 class LinkmanSerializers(serializers.ModelSerializer):
     customer_name = serializers.SerializerMethodField()
     class Meta:
@@ -38,6 +44,7 @@ class LinkmanSerializers(serializers.ModelSerializer):
         if not obj.customer:
             return ''
         return obj.customer.customer_name
+
 
 
 

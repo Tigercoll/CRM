@@ -120,4 +120,11 @@ class LinkmanView(APIView):
             return response_format.render_data(status_code.OK, ser.data, '修改成功')
         return response_format.render_data(status_code.FAILED_2_UPDATE, ser.errors, '修改失败')
     def delete(self,request,pk):
-        pass
+        linkman_obj = LinkMan.objects.filter(id=pk).first()
+        if not linkman_obj:
+            return response_format.render_data(status_code.PARAMETER_ERROR, '', '参数错误')
+        try:
+            linkman_obj.delete()
+            return response_format.render_data(status_code.OK, '', '删除成功')
+        except Exception as e:
+            return response_format.render_data(status_code.FAILED_2_DELETE, e, '删除失败')

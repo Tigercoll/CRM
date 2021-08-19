@@ -93,7 +93,9 @@
             <el-table-column prop="name" label="联系人"> </el-table-column>
             <el-table-column prop="customer_name" label="客户名称">
             </el-table-column>
-            <el-table-column prop="gender" label="性别"> </el-table-column>
+            <el-table-column  prop="gender_name" label="性别"> 
+             
+            </el-table-column>
             <el-table-column prop="position" label="职位"> </el-table-column>
             <el-table-column prop="QQ" label="QQ"> </el-table-column>
             <el-table-column prop="phone" label="手机号"> </el-table-column>
@@ -102,7 +104,7 @@
             <el-table-column label="操作">
               <template slot-scope="scope">
                 <el-button type="warning" size="mini" @click="openEditLinkmanForm(scope.row)">修改</el-button>
-                <el-button type="danger" size="mini">删除</el-button>
+                <el-button type="danger" size="mini" @click="delLinkman(scope.row)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -191,7 +193,7 @@
 </template>
 <script>
 import Crumb from "../crumb.vue";
-import { get, post, put } from "../../assets/js/utils";
+import { get, post, put, _delete } from "../../assets/js/utils";
 export default {
   name: "Linkman",
   components: { Crumb },
@@ -342,6 +344,37 @@ export default {
           this.$message.success(result.msg)
           this.openEditCustomereVisible = false
       })
+    },
+    // 删除联系人
+    delLinkman(row){
+      this.$confirm('此操作将永久该记录, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(async () => {
+          const result = await _delete('linkman/'+row.id)
+          if (result.code!=1000) {
+            throw result.msg
+          }
+          this.get_linkman_list()
+          this.$message({
+            type: 'success',
+            message: result.msg
+          });
+          
+        }).catch((error) => {
+          let msg =null
+          if (error=='cancel') {
+             msg = '取消' 
+          }
+          else{
+            msg = error
+          }
+          this.$message({
+            type: 'info',
+            message: msg
+          });          
+        });
     }
   },
 };

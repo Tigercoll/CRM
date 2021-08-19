@@ -33,11 +33,13 @@ class CustomerSearchSerializers(serializers.Serializer):
 
 class LinkmanSerializers(serializers.ModelSerializer):
     customer_name = serializers.SerializerMethodField()
+    gender_name = serializers.SerializerMethodField()
     class Meta:
         model = LinkMan
         fields = '__all__'
         extra_kwargs = {
             'customer_name': {'read_only': True},
+            'gender_name': {'read_only': True},
         }
 
     def get_customer_name(self,obj):
@@ -46,6 +48,9 @@ class LinkmanSerializers(serializers.ModelSerializer):
             return ''
         return obj.customer.customer_name
 
+    # 获取性别
+    def get_gender_name(self,obj):
+        return obj.get_gender_display()
 
 
 

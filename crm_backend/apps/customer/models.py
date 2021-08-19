@@ -74,5 +74,5 @@ class LinkMan(models.Model):
     @property
     def customer(self):
         if not hasattr(self,'_customer'):
-            self._customer = Customer.objects.filter(id=self.customer_id).first()
+            self._customer = Customer.objects.filter(customer_id=self.customer_id).first()
         return self._customer

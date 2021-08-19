@@ -93,7 +93,6 @@ class LinkmanListView(APIView):
 
     def post(self,request):
         data = request.data
-        print(data)
         ser = LinkmanSerializers(data=data)
         if ser.is_valid():
             ser.save()
@@ -103,10 +102,22 @@ class LinkmanListView(APIView):
 
 class LinkmanView(APIView):
     def get(self,request,pk):
-        pass
+        linkman_obj = LinkMan.objects.filter(id=pk).first()
+        if not linkman_obj:
+            return response_format.render_data(status_code.PARAMETER_ERROR,'','参数错误')
+        ser = LinkmanSerializers(instance=linkman_obj,many=False)
+        return response_format.render_data(status_code.OK, ser.data, '获取成功')
 
-    def post(self,request,pk):
-        pass
-
+    def put(self,request,pk):
+        linkman_obj = LinkMan.objects.filter(id=pk).first()
+        if not linkman_obj:
+            return  response_format.render_data(status_code.PARAMETER_ERROR, '', '参数错误')
+        data = request.data
+        print(data)
+        ser = LinkmanSerializers(instance=linkman_obj,data=data)
+        if ser.is_valid():
+            ser.save()
+            return response_format.render_data(status_code.OK, ser.data, '修改成功')
+        return response_format.render_data(status_code.FAILED_2_UPDATE, ser.errors, '修改失败')
     def delete(self,request,pk):
         pass

@@ -25,6 +25,7 @@
             title="添加联系人"
             :visible.sync="openAddCustomereVisible"
             width="30%"
+            @close ="clearLinkmanForm"
           >
             <el-form
               :model="linkmanForm"
@@ -45,7 +46,7 @@
                   reserve-keyword
                   placeholder="请输入关键词"
                   :remote-method="get_customer_list"
-                  :loading="loading"
+                  style="width: 100%"
                 >
                   <el-option
                     v-for="item in customer_list"
@@ -60,7 +61,7 @@
                 <el-input v-model="linkmanForm.phone"></el-input>
               </el-form-item>
               <el-form-item label="性别" prop="gender">
-               <el-select v-model="linkmanForm.gender">
+               <el-select v-model="linkmanForm.gender" style="width: 100%">
                   <el-option :key='index' v-for="(item,index) in gender_list"
                   :label="item.name"
                   :value="item.id"
@@ -80,7 +81,7 @@
               </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-              <el-button>取 消</el-button>
+              <el-button @click="cancelAdd">取 消</el-button>
               <el-button type="primary" @click="addLinkman">添 加</el-button>
             </span>
           </el-dialog>
@@ -99,12 +100,78 @@
             <el-table-column prop="likes" label="爱好"> </el-table-column>
             <el-table-column prop="remark" label="备注"> </el-table-column>
             <el-table-column label="操作">
-              <template>
-                <el-button type="warning" size="mini">修改</el-button>
+              <template slot-scope="scope">
+                <el-button type="warning" size="mini" @click="openEditLinkmanForm(scope.row)">修改</el-button>
                 <el-button type="danger" size="mini">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
+          <!-- 编辑用户对话框 -->
+          <el-dialog
+            title="修改联系人"
+            :visible.sync="openEditCustomereVisible"
+            width="30%"
+            @close ="clearLinkmanForm"
+          >
+            <el-form
+              :model="linkmanForm"
+              :rules="linkmanFormRules"
+              ref="editLinkmanFormRef"
+              label-width="100px"
+              style="width: 90%"
+            >
+              <el-form-item label="姓名" prop="name">
+                <el-input v-model="linkmanForm.name"></el-input>
+              </el-form-item>
+              <el-form-item label="客户" prop="customer_id">
+                <el-select
+                  v-model="linkmanForm.customer_id"
+                  clearable
+                  filterable
+                  remote
+                  reserve-keyword
+                  placeholder="请输入关键词"
+                  :remote-method="get_customer_list"
+                  style="width: 100%"
+                >
+                  <el-option
+                    v-for="item in customer_list"
+                    :key="item.customer_id"
+                    :label="item.customer_name"
+                    :value="item.customer_id"
+                  >
+                  </el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="手机号" prop="phone">
+                <el-input v-model="linkmanForm.phone"></el-input>
+              </el-form-item>
+              <el-form-item label="性别" prop="gender">
+               <el-select v-model="linkmanForm.gender" style="width: 100%">
+                  <el-option :key='index' v-for="(item,index) in gender_list"
+                  :label="item.name"
+                  :value="item.id"
+                  >
+
+                  </el-option>
+               </el-select>
+              </el-form-item>
+              <el-form-item label="QQ" prop="QQ">
+                <el-input v-model="linkmanForm.QQ"></el-input>
+              </el-form-item>
+              <el-form-item label="爱好" prop="likes">
+                <el-input v-model="linkmanForm.likes"></el-input>
+              </el-form-item>
+              <el-form-item label="职位" prop="position">
+                <el-input v-model="linkmanForm.position"></el-input>
+              </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="openEditCustomereVisible=false">取 消</el-button>
+              <el-button type="primary" @click="editLinkman" >修 改</el-button>
+            </span>
+          </el-dialog>
+
           <div class="pagination">
             <el-pagination
               @size-change="handleSizeChange"
@@ -124,7 +191,7 @@
 </template>
 <script>
 import Crumb from "../crumb.vue";
-import { get, post } from "../../assets/js/utils";
+import { get, post, put } from "../../assets/js/utils";
 export default {
   name: "Linkman",
   components: { Crumb },
@@ -154,7 +221,7 @@ export default {
       },
       customer_list:[],
       linkmanFormRules:{},
-      loading: false,
+      openEditCustomereVisible:false,
       gender_list:[
        {
          'id':1,
@@ -209,11 +276,27 @@ export default {
       if (!query) {
         return
       }
+      
       const result =await get('customers/search/?kw='+query)
       if (result.code!=1000) {
         return
       }
+      
       this.customer_list = result.data
+      
+      
+    },
+    clearLinkmanForm(){
+      this.linkmanForm= {
+        name: "",
+        phone: "",
+        gender: "",
+        QQ: "",
+        likes: "",
+        remark: "",
+        customer_id: "",
+        position: "",
+      }
     },
     // 添加联系人
     addLinkman(){
@@ -222,8 +305,42 @@ export default {
           
         }
         const  result =await post('linkman/',this.linkmanForm)
-        console.log(result);
+        if(result.code!=1000)return this.$message.error(result.msg)
+        this.$message.success(result.msg)
+        this.clearLinkmanForm()
+        this.get_linkman_list()
+        this.openAddCustomereVisible = false
+      })
+    },
+    // 取消添加
+    cancelAdd(){
+      this.clearLinkmanForm()
+      this.openAddCustomereVisible = false
+    },
+    // 获取单条
+    async get_one_linkman(id){
+      const result  = await get('linkman/'+id)
+      if (result.code!=1000) {
+        return this.$message.erro(result.msg)
+      }
+      this.linkmanForm = result.data
+      this.get_customer_list(this.linkmanForm.customer_id)
+      this.openEditCustomereVisible = true
+      
+    },
+    // 打开修改对话框并回去单条数据
+    openEditLinkmanForm(row){
+      this.get_one_linkman(row.id)
 
+    },
+    editLinkman(){
+      this.$refs.editLinkmanFormRef.validate(async valid => {
+          if(!valid){return}
+          const result  = await put('linkman/'+this.linkmanForm.id,this.linkmanForm)
+          if(result.code!=1000){return this.$$message.error(result.msg)}
+          this.get_linkman_list()
+          this.$message.success(result.msg)
+          this.openEditCustomereVisible = false
       })
     }
   },

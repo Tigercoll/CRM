@@ -21,6 +21,6 @@ urlpatterns = [
     path('customers/<int:pk>',CustomerView.as_view()),
     path('customers/search/',CustomerListSearch.as_view()),
     path('linkman/',LinkmanListView.as_view()),
-    path('customers/<int:pk>',LinkmanView.as_view()),
+    path('linkman/<int:pk>',LinkmanView.as_view()),
 
 ]

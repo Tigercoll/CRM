@@ -41,6 +41,7 @@ class LinkmanSerializers(serializers.ModelSerializer):
         }
 
     def get_customer_name(self,obj):
+
         if not obj.customer:
             return ''
         return obj.customer.customer_name
